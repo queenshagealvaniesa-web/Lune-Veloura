@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Luné Veloura</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Nunito',sans-serif;background:#0d0000;color:white;min-height:100vh;overflow-x:hidden}
+    .lune-title{font-family:'Cormorant Garamond',serif;letter-spacing:3px;font-weight:600}
+    .hidden{display:none!important}
+
+    /* SPLASH */
+    #splash{position:fixed;inset:0;background:#0d0000;z-index:9999;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:8px;transition:opacity .8s ease}
+    #splash.fade-out{opacity:0;pointer-events:none}
+    .splash-title{font-family:'Cormorant Garamond',serif;font-size:46px;font-weight:300;letter-spacing:8px;color:#f5d7a8}
+    .splash-sub{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:13px;letter-spacing:5px;color:rgba(245,215,168,0.4);text-transform:uppercase}
+    .splash-bar{width:60px;height:1px;background:linear-gradient(to right,transparent,#f5d7a8,transparent);margin-top:20px;animation:splashBar 1.2s .4s both}
+    @keyframes splashBar{from{width:0;opacity:0}to{width:60px;opacity:1}}
+
+    /* NAVBAR */
+    .navbar{position:fixed;top:0;left:0;right:0;z-index:500;height:54px;padding:0 14px;display:flex;justify-content:space-between;align-items:center;background:rgba(13,0,0,0.92);backdrop-filter:blur(14px);border-bottom:1px solid rgba(245,215,168,0.08)}
+    .nav-logo{font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:600;letter-spacing:3px;color:#f5d7a8;cursor:pointer;user-select:none}
+    .nav-right{display:flex;align-items:center;gap:2px}
+    .nav-btn{background:none;border:none;color:rgba(255,255,255,0.6);font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;padding:7px 11px;border-radius:20px;cursor:pointer;transition:all .2s;letter-spacing:.3px}
+    .nav-btn:hover,.nav-btn.active{background:rgba(245,215,168,0.1);color:#f5d7a8}
+    .nav-cart{position:relative;background:rgba(245,215,168,0.1);border:1px solid rgba(245,215,168,0.2);border-radius:20px;padding:7px 13px;display:flex;align-items:center;gap:5px;cursor:pointer;color:#f5d7a8;font-size:13px;font-weight:800;transition:all .2s;margin-left:4px}
+    .nav-cart:hover{background:rgba(245,215,168,0.18);border-color:rgba(245,215,168,0.4)}
+    .cart-badge{background:#ee4d2d;color:white;font-size:10px;padding:1px 5px;border-radius:10px;min-width:16px;text-align:center;font-weight:800}
+
+    /* PAGE */
+    .page{padding-top:54px;min-height:100vh}
+
+    /* HERO */
+    .hero{position:relative;width:100%;height:90vw;max-height:580px;min-height:320px;overflow:hidden}
+    .hero-frame{position:absolute;inset:0;opacity:0}
+    .hero-frame img{width:100%;height:100%;object-fit:cover;object-position:center 20%}
+    .f1{animation:hFade 20s 0s infinite}
+    .f2{animation:hFade 20s 5s infinite}
+    .f3{animation:hFade 20s 10s infinite}
+    .f4{animation:hFade 20s 15s infinite}
+    @keyframes hFade{0%{opacity:0;transform:scale(1.06)}6%{opacity:1;transform:scale(1.03)}22%{opacity:1;transform:scale(1)}28%{opacity:0}100%{opacity:0}}
+    .grain{position:absolute;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.08'/%3E%3C/svg%3E");opacity:.28;mix-blend-mode:overlay;pointer-events:none}
+    .hero-vignette{position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 20%,rgba(0,0,0,0.78) 100%);z-index:2;pointer-events:none}
+    .hero-fade-bottom{position:absolute;bottom:0;left:0;right:0;height:140px;background:linear-gradient(to bottom,transparent,#0d0000);z-index:3}
+    .hero-scanlines{position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,0.032) 3px,rgba(0,0,0,0.032) 4px);z-index:3;pointer-events:none}
+    .lb{position:absolute;left:0;right:0;height:46px;background:#000;z-index:4}
+    .lb.t{top:0;animation:lbSlide .7s .2s both}
+    .lb.b{bottom:0;animation:lbSlide .7s .2s both}
+    @keyframes lbSlide{from{height:0}to{height:46px}}
+    .hero-text{position:absolute;inset:0;z-index:5;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:60px 22px;gap:11px}
+    .hero-eyebrow{font-size:10px;letter-spacing:5px;color:rgba(245,215,168,0.6);text-transform:uppercase;animation:tIn .9s .5s both}
+    .hero-h{font-family:'Cormorant Garamond',serif;font-size:clamp(40px,13vw,66px);font-weight:300;line-height:1.0;color:#fff;text-shadow:0 4px 32px rgba(0,0,0,0.7);animation:tIn .9s .7s both;letter-spacing:4px}
+    .hero-h em{color:#f5d7a8;font-style:italic}
+    .hero-sub{font-family:'Cormorant Garamond',serif;font-size:15px;letter-spacing:2px;color:rgba(255,255,255,0.55);font-style:italic;animation:tIn .9s .9s both}
+    .hero-cta{margin-top:12px;background:transparent;border:1px solid rgba(245,215,168,0.5);color:#f5d7a8;padding:12px 30px;border-radius:30px;font-size:13px;letter-spacing:2px;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700;transition:all .3s;animation:tIn .9s 1.1s both}
+    .hero-cta:hover{background:rgba(245,215,168,0.13);border-color:#f5d7a8;transform:translateY(-1px)}
+    .cta-arr{display:inline-block;animation:arrBounce 1.4s 2.2s infinite}
+    @keyframes arrBounce{0%,100%{transform:translateX(0)}50%{transform:translateX(3px)}}
+    @keyframes tIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+    .scroll-dot-wrap{position:absolute;bottom:54px;left:50%;transform:translateX(-50%);z-index:6}
+    .scroll-dot{width:5px;height:5px;background:#f5d7a8;border-radius:50%;animation:dotP 2s 2.5s infinite}
+    @keyframes dotP{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.2;transform:scale(1.8)}}
+
+    /* SECTION HEAD */
+    .sec-head{padding:30px 16px 16px;display:flex;justify-content:space-between;align-items:flex-end}
+    .sec-label{font-size:10px;letter-spacing:4px;text-transform:uppercase;color:rgba(245,215,168,0.38);font-family:'Cormorant Garamond',serif;font-style:italic;margin-bottom:4px}
+    .sec-title{font-family:'Cormorant Garamond',serif;font-size:25px;font-weight:600;color:#f5d7a8;letter-spacing:1px}
+    .see-all{font-size:12px;color:rgba(245,215,168,0.45);letter-spacing:1px;text-transform:uppercase;cursor:pointer;font-family:'Cormorant Garamond',serif;font-style:italic;border-bottom:1px solid rgba(245,215,168,0.2);padding-bottom:1px;transition:color .2s}
+    .see-all:hover{color:#f5d7a8}
+
+    /* BEST SELLERS */
+    .bs-row{padding:0 16px 24px;display:flex;gap:12px;overflow-x:auto;scrollbar-width:none}
+    .bs-row::-webkit-scrollbar{display:none}
+    .bs-card{flex:0 0 155px;background:linear-gradient(155deg,#1a0500,#270800);border:1px solid rgba(245,215,168,0.09);border-radius:14px;overflow:hidden;cursor:pointer;transition:all .25s;position:relative}
+    .bs-card:hover{transform:translateY(-4px);border-color:rgba(245,215,168,0.28);box-shadow:0 14px 34px rgba(0,0,0,0.55)}
+    .bs-card img{width:100%;height:220px;object-fit:contain;background:#120300;display:block}
+    .bs-card-body{padding:10px}
+    .bs-card-name{font-size:13px;font-weight:700;color:#f5d7a8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:3px}
+    .bs-card-price{font-size:12px;color:#ee4d2d;font-weight:800}
+    .bs-card-stars{font-size:10px;color:rgba(255,180,70,0.65);margin-top:2px}
+    .bs-badge{position:absolute;top:8px;left:8px;background:#ee4d2d;color:white;font-size:9px;font-weight:800;padding:2px 7px;border-radius:20px;letter-spacing:.3px}
+
+    /* PROMO */
+    .promo{margin:0 16px 28px;background:linear-gradient(120deg,#3d0000,#620000,#3d0000);border:1px solid rgba(245,215,168,0.13);border-radius:14px;padding:18px 18px;display:flex;justify-content:space-between;align-items:center;gap:10px;overflow:hidden;position:relative}
+    .promo::before{content:'';position:absolute;right:-28px;top:-28px;width:110px;height:110px;border-radius:50%;background:rgba(245,215,168,0.04)}
+    .promo-tag{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:rgba(245,215,168,0.45);margin-bottom:5px;font-style:italic}
+    .promo-text{font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:600;color:#f5d7a8;line-height:1.25}
+    .promo-code{font-size:11px;color:rgba(255,255,255,0.5);margin-top:5px}
+    .promo-code b{background:rgba(255,255,255,0.1);border-radius:5px;padding:2px 7px;color:white;letter-spacing:.5px}
+    .promo-btn{flex-shrink:0;background:#f5d7a8;color:#3d0000;font-size:12px;font-weight:800;padding:10px 16px;border-radius:10px;border:none;cursor:pointer;font-family:'Nunito',sans-serif;transition:all .2s;white-space:nowrap}
+    .promo-btn:hover{background:#fff;transform:scale(1.04)}
+
+    /* CATEGORIES */
+    .cat-grid{padding:0 16px 28px;display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+    .cat-item{background:linear-gradient(155deg,#1a0500,#270800);border:1px solid rgba(245,215,168,0.07);border-radius:12px;padding:14px 6px;text-align:center;cursor:pointer;transition:all .22s}
+    .cat-item:hover{border-color:rgba(245,215,168,0.28);transform:translateY(-2px)}
+    .cat-icon{font-size:21px;margin-bottom:6px}
+    .cat-name{font-size:10px;color:rgba(245,215,168,0.65);letter-spacing:1px;text-transform:uppercase;font-weight:700}
+
+    /* TESTIMONIALS */
+    .testi-row{padding:0 16px 30px;display:flex;gap:12px;overflow-x:auto;scrollbar-width:none}
+    .testi-row::-webkit-scrollbar{display:none}
+    .testi-card{flex:0 0 210px;background:linear-gradient(155deg,#1a0500,#250800);border:1px solid rgba(245,215,168,0.09);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:8px}
+    .testi-stars{color:#ffb400;font-size:12px}
+    .testi-text{font-size:12px;color:rgba(255,255,255,0.7);line-height:1.55;font-style:italic;font-family:'Cormorant Garamond',serif}
+    .testi-name{font-size:10px;color:rgba(245,215,168,0.42);font-weight:700;letter-spacing:1px}
+
+    /* CONTACT */
+    .contact-divider{padding:6px 16px 0;display:flex;align-items:center;gap:12px}
+    .div-line{flex:1;height:1px;background:linear-gradient(to right,transparent,rgba(245,215,168,0.18),transparent)}
+    .div-icon{font-size:11px;color:rgba(245,215,168,0.35)}
+    .contact-sec{background:linear-gradient(180deg,#110300,#180500);margin-top:18px;padding:26px 16px 36px;border-top:1px solid rgba(245,215,168,0.07)}
+    .contact-tagline{text-align:center;font-size:10px;letter-spacing:5px;text-transform:uppercase;color:rgba(245,215,168,0.28);font-family:'Cormorant Garamond',serif;font-style:italic;margin-bottom:5px}
+    .contact-title{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:#f5d7a8;text-align:center;margin-bottom:18px;letter-spacing:2px}
+    .contact-cards{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
+    .contact-card{background:rgba(255,255,255,0.03);border:1px solid rgba(245,215,168,0.09);border-radius:10px;padding:11px;display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit;transition:all .2s}
+    .contact-card:hover{background:rgba(245,215,168,0.05);border-color:rgba(245,215,168,0.22)}
+    .cc-icon{font-size:19px;flex-shrink:0}
+    .cc-label{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(245,215,168,0.35);margin-bottom:2px}
+    .cc-value{font-size:11px;font-weight:700;color:#f5d7a8}
+    .contact-hours{text-align:center;font-size:11px;color:rgba(245,215,168,0.3);margin-bottom:18px}
+    .contact-footer{text-align:center;font-family:'Cormorant Garamond',serif;font-size:13px;color:rgba(245,215,168,0.18);letter-spacing:3px}
+
+    /* PRODUCTS PAGE */
+    .prod-page-head{padding:22px 16px 12px}
+    .prod-filter{padding:0 16px 16px;display:flex;gap:8px;overflow-x:auto;scrollbar-width:none}
+    .prod-filter::-webkit-scrollbar{display:none}
+    .chip{flex-shrink:0;background:rgba(255,255,255,0.04);border:1px solid rgba(245,215,168,0.13);border-radius:20px;padding:7px 15px;font-size:12px;color:rgba(245,215,168,0.55);cursor:pointer;font-weight:600;transition:all .2s;white-space:nowrap}
+    .chip.active,.chip:hover{background:rgba(245,215,168,0.12);border-color:rgba(245,215,168,0.45);color:#f5d7a8}
+    .prod-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;padding:0 16px 110px}
+    .prod-card{background:linear-gradient(155deg,#1a0500,#250800);border:1px solid rgba(245,215,168,0.08);border-radius:14px;overflow:hidden;cursor:pointer;transition:all .24s}
+    .prod-card:hover{transform:translateY(-3px);border-color:rgba(245,215,168,0.24);box-shadow:0 10px 28px rgba(0,0,0,0.5)}
+    .prod-card img{width:100%;height:155px;object-fit:contain;background:#120300;display:block}
+    .prod-card-body{padding:10px}
+    .prod-card-name{font-size:13px;font-weight:700;color:#f5d7a8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:3px}
+    .prod-card-desc{font-size:11px;color:rgba(255,255,255,0.42);line-height:1.4;margin-bottom:6px;white-space:normal;word-break:break-word}
+    .prod-card-price{font-size:13px;color:#ee4d2d;font-weight:800}
+    .prod-card-stars{font-size:10px;color:rgba(255,180,70,0.55);margin-top:2px}
+
+    /* DETAIL PANEL */
+    .side-panel{position:fixed;top:0;left:0;width:100%;height:100%;background:#0d0000;color:white;z-index:600;transition:transform .35s cubic-bezier(.4,0,.2,1);overflow-y:auto;transform:translateX(110%)}
+    .side-panel.active{transform:translateX(0)}
+    .side-hdr{background:rgba(13,0,0,0.97);padding:13px 15px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:10;border-bottom:1px solid rgba(245,215,168,0.09);backdrop-filter:blur(12px)}
+    .side-hdr h2{margin:0;font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;letter-spacing:2px;flex:1;text-align:center;color:#f5d7a8}
+    .back-btn{background:rgba(245,215,168,0.09);border:1px solid rgba(245,215,168,0.18);color:#f5d7a8;padding:8px 13px;border-radius:20px;cursor:pointer;font-size:15px;font-weight:700;transition:all .2s}
+    .back-btn:hover{background:rgba(245,215,168,0.18)}
+    .side-body{padding:15px;padding-bottom:140px}
+    .detail-img{width:100%;height:270px;object-fit:contain;border-radius:12px;background:#120300;display:block;margin-bottom:14px}
+    .detail-name{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:#f5d7a8;margin-bottom:5px;letter-spacing:1px}
+    .detail-price{color:#ee4d2d;font-size:24px;font-weight:800;margin-bottom:5px}
+    .detail-rating{color:#ffb400;font-size:13px;margin-bottom:14px}
+    .detail-desc-label{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(245,215,168,0.38);margin-bottom:7px}
+    .detail-desc{color:rgba(255,255,255,0.72);font-size:14px;line-height:1.7;background:rgba(255,255,255,0.04);border:1px solid rgba(245,215,168,0.07);border-radius:10px;padding:12px;white-space:normal;word-break:break-word}
+    .review-label{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(245,215,168,0.38);margin:18px 0 10px}
+    .rev-item{background:rgba(255,255,255,0.04);border:1px solid rgba(245,215,168,0.06);border-radius:10px;padding:10px 12px;margin-bottom:8px}
+    .rev-item .stars{color:#ffb400;font-size:12px;margin-bottom:4px}
+    .rev-item p{font-size:13px;color:rgba(255,255,255,0.68);font-style:italic;margin:3px 0}
+    .rev-item small{font-size:11px;color:rgba(245,215,168,0.35)}
+    .detail-footer{position:fixed;left:0;bottom:0;width:100%;background:rgba(13,0,0,0.97);border-top:1px solid rgba(245,215,168,0.09);display:flex;gap:10px;padding:13px 15px 24px;z-index:650;backdrop-filter:blur(12px)}
+    .detail-footer button{flex:1;padding:13px;border-radius:10px;border:none;font-size:15px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;transition:all .2s}
+    .add-cart-btn{background:#ee4d2d;color:white}
+    .add-cart-btn:hover{background:#d43d1f;transform:translateY(-1px)}
+    .buy-btn{background:#f5d7a8;color:#3d0000}
+    .buy-btn:hover{background:#fff;transform:translateY(-1px)}
+
+    /* CHECKOUT */
+    .co-hdr{background:linear-gradient(135deg,#3d0000,#600000);padding:13px 15px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:10;border-bottom:1px solid rgba(245,215,168,0.12)}
+    .co-hdr h2{margin:0;font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;letter-spacing:2px;flex:1;text-align:center;color:#f5d7a8}
+    .co-box{background:rgba(255,255,255,0.04);border:1px solid rgba(245,215,168,0.09);border-radius:14px;padding:15px;margin-bottom:13px}
+    .co-box h3{color:#f5d7a8;font-size:15px;margin-bottom:11px;display:flex;align-items:center;gap:8px}
+    input,select{width:100%;padding:10px 12px;margin-top:6px;border-radius:10px;border:1px solid rgba(245,215,168,0.18);background:rgba(255,255,255,0.05);color:white;font-size:14px;font-family:'Nunito',sans-serif}
+    input::placeholder{color:rgba(255,255,255,0.3)}
+    select option{background:#1a0500;color:white}
+    .qris-box{background:rgba(255,255,255,0.04);padding:18px;border-radius:10px;text-align:center;margin:11px 0;border:1px solid rgba(245,215,168,0.09)}
+    .qris-img{width:175px;height:175px;margin:10px auto;display:block;border-radius:8px}
+    .qris-timer{color:#ee4d2d;font-weight:800;margin:10px 0;font-size:14px}
+    .qris-ok{background:rgba(46,125,50,0.14);color:#81c784;padding:14px;border-radius:10px;text-align:center;display:none;border:1px solid rgba(46,125,50,0.28)}
+    .co-total{font-size:17px;font-weight:800;color:#f5d7a8;margin-top:10px;text-align:right}
+    .pay-btn{width:100%;background:linear-gradient(135deg,#ee4d2d,#c0392b);color:white;padding:14px;border:none;border-radius:10px;font-size:16px;font-weight:800;cursor:pointer;margin-top:10px;font-family:'Nunito',sans-serif;transition:all .2s}
+    .pay-btn:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(238,77,45,0.38)}
+
+    /* CART */
+    .cart-pg{position:fixed;top:0;left:0;width:100%;height:100%;background:#0d0000;z-index:600;overflow-y:auto}
+    .cart-hdr{background:rgba(13,0,0,0.97);border-bottom:1px solid rgba(245,215,168,0.09);padding:13px 15px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:10;backdrop-filter:blur(12px)}
+    .cart-hdr h2{font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:600;color:#f5d7a8;letter-spacing:2px;flex:1;text-align:center}
+    .cart-wrap{padding:15px;padding-bottom:130px}
+    .cart-item{background:rgba(255,255,255,0.04);border:1px solid rgba(245,215,168,0.08);border-radius:12px;padding:11px;margin-bottom:10px;display:flex;gap:11px;align-items:center}
+    .cart-item img{width:68px;height:68px;object-fit:contain;border-radius:8px;background:#120300;flex-shrink:0}
+    .ci-info{flex:1;min-width:0}
+    .ci-name{font-size:13px;font-weight:700;color:#f5d7a8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:3px}
+    .ci-price{color:#ee4d2d;font-weight:800;font-size:13px}
+    .ci-qty{display:flex;align-items:center;gap:8px;margin-top:6px}
+    .qty-btn{width:26px;height:26px;border:1px solid rgba(245,215,168,0.18);background:rgba(255,255,255,0.05);color:#f5d7a8;border-radius:6px;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;font-weight:700;transition:all .18s}
+    .qty-btn:hover{background:rgba(245,215,168,0.14)}
+    .del-btn{background:none;border:none;color:#ee4d2d;cursor:pointer;font-size:20px;padding:3px;flex-shrink:0}
+    .cart-foot{position:fixed;bottom:0;left:0;width:100%;background:rgba(13,0,0,0.97);border-top:1px solid rgba(245,215,168,0.09);padding:13px 15px 24px;backdrop-filter:blur(12px)}
+    .cart-total-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:11px}
+    .cart-total-lbl{font-size:13px;color:rgba(255,255,255,0.55)}
+    .cart-total-val{font-size:20px;font-weight:800;color:#f5d7a8}
+    .cart-co-btn{width:100%;background:linear-gradient(135deg,#ee4d2d,#c0392b);color:white;padding:14px;border:none;border-radius:10px;font-size:16px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;transition:all .2s}
+    .cart-co-btn:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(238,77,45,0.38)}
+    .cart-empty{text-align:center;padding:60px 20px;color:rgba(255,255,255,0.35)}
+    .cart-empty p:first-child{font-size:18px;margin-bottom:8px;font-family:'Cormorant Garamond',serif;color:rgba(245,215,168,0.4)}
+
+    /* BUBBLE */
+    .cart-bubble{position:fixed;width:15px;height:15px;background:#ee4d2d;border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);box-shadow:0 0 8px rgba(238,77,45,0.6)}
+    @keyframes flyToCart{0%{opacity:1;transform:translate(-50%,-50%) scale(1)}80%{opacity:.8}100%{opacity:0;transform:translate(calc(var(--tx) - 50%),calc(var(--ty) - 50%)) scale(0.18)}}
+
+    /* RECEIPT */
+    .receipt-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.87);z-index:999;display:flex;justify-content:center;align-items:flex-start;padding:20px;overflow-y:auto}
+    .receipt-wrap{background:white;color:#111;width:100%;max-width:420px;border-radius:12px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.6);margin:auto}
+    .rc-top{background:linear-gradient(135deg,#800000,#b30000);color:white;padding:20px;text-align:center}
+    .rc-top h2{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:600;letter-spacing:3px;margin-bottom:4px}
+    .rc-top p{font-size:12px;opacity:.85;margin:2px 0}
+    .rc-badge{display:inline-block;background:rgba(255,255,255,0.2);border-radius:20px;padding:4px 14px;font-size:12px;margin-top:8px}
+    .rc-body{padding:18px}
+    .rc-sec-lbl{font-size:11px;font-weight:700;color:#999;letter-spacing:1px;text-transform:uppercase;margin:15px 0 8px}
+    .rc-row{display:flex;justify-content:space-between;align-items:flex-start;padding:5px 0;border-bottom:.5px solid #f0f0f0;font-size:13px}
+    .rc-row:last-child{border-bottom:none}
+    .rc-row .lbl{color:#555;flex:1}
+    .rc-row .val{color:#111;font-weight:500;text-align:right;flex:1}
+    .rc-div{border:none;border-top:1.5px dashed #ddd;margin:11px 0}
+    .rc-item-row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:.5px solid #f5f5f5;font-size:13px}
+    .rc-item-name{color:#111;flex:2;font-weight:500}
+    .rc-item-qty{color:#888;flex:1;text-align:center}
+    .rc-item-price{color:#ee4d2d;flex:1;text-align:right;font-weight:600}
+    .rc-total-row{display:flex;justify-content:space-between;align-items:center;padding:11px 0;font-size:16px;font-weight:700}
+    .rc-total-row .t-lbl{color:#333}
+    .rc-total-row .t-val{color:#ee4d2d;font-size:20px}
+    .rc-discount{display:flex;justify-content:space-between;padding:5px 0;color:#2e7d32;font-size:13px;font-weight:600}
+    .rc-foot-note{text-align:center;padding:14px 18px 8px;font-size:11px;color:#aaa;line-height:1.6;border-top:1px solid #f0f0f0}
+    .rc-barcode{text-align:center;padding:11px 18px;border-top:1px solid #f0f0f0}
+    .rc-barcode p{font-size:10px;color:#bbb;margin-top:5px;font-family:monospace;letter-spacing:2px}
+    .rc-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:14px 18px 18px;border-top:1px solid #f0f0f0}
+    .rc-actions button{padding:12px;border-radius:8px;border:none;font-size:14px;font-weight:700;cursor:pointer}
+    .btn-print{background:#660000;color:white}
+    .btn-close-rc{background:#f0f0f0;color:#333}
+    .rc-pay-chip{display:inline-block;background:#fff3e0;color:#e65100;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700}
+    .rc-status-chip{display:inline-block;background:#e8f5e9;color:#2e7d32;padding:4px 13px;border-radius:20px;font-size:12px;font-weight:700}
+    .rc-order-id{font-family:monospace;font-size:11px;color:#aaa}
+
+    @media print{body *{visibility:hidden}.receipt-overlay,.receipt-overlay *{visibility:visible}.receipt-overlay{position:fixed;top:0;left:0;width:100%;background:white;z-index:9999;padding:0}.rc-actions{display:none}}
+  </style>
+</head>
+<body>
+
+<!-- SPLASH -->
+<div id="splash">
+  <div class="splash-title">Luné Veloura</div>
+  <div class="splash-sub">Luxury Heels Boutique</div>
+  <div class="splash-bar"></div>
+</div>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <div class="nav-logo" onclick="showPage('home')">Luné Veloura</div>
+  <div class="nav-right">
+    <button class="nav-btn active" id="nb-home" onclick="showPage('home')">Beranda</button>
+    <button class="nav-btn" id="nb-prod" onclick="showPage('products')">Produk</button>
+    <div class="nav-cart" onclick="openCart()">
+      🛒 <span class="cart-badge" id="cartCount">0</span>
+    </div>
+  </div>
+</nav>
+
+<!-- HOME PAGE -->
+<div id="pg-home" class="page">
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-frame f1"><img src="https://images.unsplash.com/photo-1543163521-1bf539c55dd2?w=900&q=80" alt=""><div class="grain"></div></div>
+    <div class="hero-frame f2"><img src="https://images.unsplash.com/photo-1515347619252-60a4bf4fff4f?w=900&q=80" alt=""><div class="grain"></div></div>
+    <div class="hero-frame f3"><img src="https://images.unsplash.com/photo-1603487742131-4160ec999306?w=900&q=80" alt=""><div class="grain"></div></div>
+    <div class="hero-frame f4"><img src="https://images.unsplash.com/photo-1554244933-d876deb6b2ff?w=900&q=80" alt=""><div class="grain"></div></div>
+    <div class="hero-vignette"></div>
+    <div class="hero-fade-bottom"></div>
+    <div class="hero-scanlines"></div>
+    <div class="lb t"></div>
+    <div class="lb b"></div>
+    <div class="hero-text">
+      <p class="hero-eyebrow">✦ New Collection 2025 ✦</p>
+      <h1 class="hero-h">Walk in<br><em>Luxury</em></h1>
+      <p class="hero-sub">Setiap langkah adalah pernyataan.</p>
+      <button class="hero-cta" onclick="showPage('products')">Lihat Koleksi <span class="cta-arr">→</span></button>
+    </div>
+    <div class="scroll-dot-wrap"><div class="scroll-dot"></div></div>
+  </div>
+
+  <!-- Best Sellers -->
+  <div class="sec-head">
+    <div><p class="sec-label">Pilihan Terlaris</p><h2 class="sec-title">Best Seller</h2></div>
+    <span class="see-all" onclick="showPage('products')">Lihat Semua →</span>
+  </div>
+  <div class="bs-row" id="bsRow"></div>
+
+  <!-- Promo -->
+  <div class="promo">
+    <div>
+      <p class="promo-tag">✦ Penawaran Spesial</p>
+      <p class="promo-text">Diskon 20%<br>untuk semua koleksi</p>
+      <p class="promo-code">Kode: <b>heelsnyaqaqa</b></p>
+    </div>
+    <button class="promo-btn" onclick="showPage('products')">Belanja →</button>
+  </div>
+
+  <!-- Kategori -->
+  <div class="sec-head"><div><p class="sec-label">Temukan Style Kamu</p><h2 class="sec-title">Kategori</h2></div></div>
+  <div class="cat-grid">
+    <div class="cat-item" onclick="showPage('products')"><div class="cat-icon">👠</div><p class="cat-name">Stiletto</p></div>
+    <div class="cat-item" onclick="showPage('products')"><div class="cat-icon">🖤</div><p class="cat-name">Formal</p></div>
+    <div class="cat-item" onclick="showPage('products')"><div class="cat-icon">🌿</div><p class="cat-name">Kasual</p></div>
+    <div class="cat-item" onclick="showPage('products')"><div class="cat-icon">✨</div><p class="cat-name">Premium</p></div>
+  </div>
+
+  <!-- Testimoni -->
+  <div class="sec-head"><div><p class="sec-label">Kata Mereka</p><h2 class="sec-title">Ulasan Pelanggan</h2></div></div>
+  <div class="testi-row">
+    <div class="testi-card"><div class="testi-stars">⭐⭐⭐⭐⭐</div><p class="testi-text">"Kualitasnya luar biasa, bahan premium dan nyaman dipakai seharian."</p><p class="testi-name">— Anakonda M.</p></div>
+    <div class="testi-card"><div class="testi-stars">⭐⭐⭐⭐⭐</div><p class="testi-text">"Pengiriman super cepat, heels-nya persis seperti foto. Recommended!"</p><p class="testi-name">— Queensha R.</p></div>
+    <div class="testi-card"><div class="testi-stars">⭐⭐⭐⭐⭐</div><p class="testi-text">"Sudah beli 3 pasang, selalu puas. Packaging-nya mewah banget!"</p><p class="testi-name">— Bella K.</p></div>
+    <div class="testi-card"><div class="testi-stars">⭐⭐⭐⭐</div><p class="testi-text">"Warna persis sesuai foto, tidak mengecewakan. Harga sesuai kualitas!"</p><p class="testi-name">— Diana S.</p></div>
+  </div>
+
+  <!-- Contact -->
+  <div class="contact-divider"><span class="div-line"></span><span class="div-icon">✦</span><span class="div-line"></span></div>
+  <div class="contact-sec">
+    <p class="contact-tagline">Luxury at your fingertips</p>
+    <h2 class="contact-title">Hubungi Kami</h2>
+    <div class="contact-cards">
+      <a class="contact-card" href="https://wa.me/6281234567890" target="_blank"><div class="cc-icon">💬</div><div><p class="cc-label">WhatsApp</p><p class="cc-value">0812-3456-7890</p></div></a>
+      <a class="contact-card" href="https://instagram.com/luneveloura" target="_blank"><div class="cc-icon">📸</div><div><p class="cc-label">Instagram</p><p class="cc-value">@luneveloura</p></div></a>
+      <a class="contact-card" href="mailto:hello@luneveloura.com"><div class="cc-icon">✉️</div><div><p class="cc-label">Email</p><p class="cc-value">hello@luneveloura.com</p></div></a>
+      <div class="contact-card"><div class="cc-icon">📍</div><div><p class="cc-label">Lokasi</p><p class="cc-value">Jakarta, Indonesia</p></div></div>
+    </div>
+    <p class="contact-hours">⏰ Senin – Sabtu, 09.00 – 21.00 WIB</p>
+    <p class="contact-footer">Luné Veloura © 2025</p>
+  </div>
+</div>
+
+<!-- PRODUCTS PAGE -->
+<div id="pg-prod" class="page hidden">
+  <div class="prod-page-head"><p class="sec-label">Semua Koleksi</p><h2 class="sec-title">Produk Kami</h2></div>
+  <div class="prod-filter">
+    <div class="chip active" onclick="filterProds('all',this)">Semua</div>
+    <div class="chip" onclick="filterProds('zara',this)">Zara</div>
+    <div class="chip" onclick="filterProds('saint',this)">Saint Laurent</div>
+    <div class="chip" onclick="filterProds('dior',this)">Christian Dior</div>
+    <div class="chip" onclick="filterProds('leopard',this)">Leopard</div>
+  </div>
+  <div class="prod-grid" id="prodGrid"></div>
+</div>
+
+<!-- DETAIL PANEL -->
+<div id="detailPanel" class="side-panel">
+  <div class="side-hdr">
+    <button class="back-btn" onclick="closeDetail()">←</button>
+    <h2>Detail Produk</h2>
+    <span style="width:56px"></span>
+  </div>
+  <div class="side-body">
+    <img id="dImg" class="detail-img" alt="">
+    <p class="detail-name" id="dName"></p>
+    <p class="detail-price" id="dPrice"></p>
+    <p class="detail-rating" id="dRating"></p>
+    <p class="detail-desc-label">Deskripsi Produk</p>
+    <p class="detail-desc" id="dDesc"></p>
+    <p class="review-label">📝 Ulasan Pembeli</p>
+    <div class="rev-item"><div class="stars">⭐⭐⭐⭐⭐</div><p>"Kualitas sangat bagus, pengiriman cepat!"</p><small>— Anakonda</small></div>
+    <div class="rev-item"><div class="stars">⭐⭐⭐⭐⭐</div><p>"Heelsnya nyaman banget, suka banget!"</p><small>— Queensha</small></div>
+    <div class="rev-item"><div class="stars">⭐⭐⭐⭐</div><p>"Warna sesuai foto, recommended!"</p><small>— Bella</small></div>
+  </div>
+  <div class="detail-footer">
+    <button class="add-cart-btn" id="addCartBtn" onclick="addToCart()">+ Keranjang</button>
+    <button class="buy-btn" onclick="buyNow()">Beli Sekarang</button>
+  </div>
+</div>
+
+<!-- CHECKOUT PANEL -->
+<div id="checkoutPanel" class="side-panel">
+  <div class="co-hdr side-hdr">
+    <button class="back-btn" onclick="closeCheckout()">←</button>
+    <h2>Checkout</h2>
+    <span style="width:56px"></span>
+  </div>
+  <div class="side-body">
+    <div class="co-box">
+      <h3>📦 Alamat Pengiriman</h3>
+      <input id="nameInput" placeholder="Nama Penerima">
+      <input id="phoneInput" placeholder="No HP" style="margin-top:8px">
+      <input id="addressInput" placeholder="Alamat Lengkap" style="margin-top:8px">
+    </div>
+    <div class="co-box">
+      <h3>💳 Pembayaran</h3>
+      <input id="voucher" placeholder="Kode Voucher (coba: heelsnyaqaqa)">
+      <select id="payment" style="margin-top:8px" onchange="handlePaymentChange()">
+        <option value="">Pilih Metode Pembayaran</option>
+        <option>COD (Bayar di Tempat)</option>
+        <option>Transfer Bank</option>
+        <option>E-Wallet (GoPay, OVO, DANA)</option>
+        <option value="qris">QRIS (Scan QR)</option>
+      </select>
+      <div id="qrisSection" class="hidden">
+        <div class="qris-box">
+          <h4 style="color:#f5d7a8;margin-bottom:10px;font-size:14px">Scan QRIS untuk Pembayaran</h4>
+          <img class="qris-img" src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=LuneVelouraPayment" alt="QRIS">
+          <p class="qris-timer" id="qrisTimer"></p>
+        </div>
+        <div id="qrisSuccess" class="qris-ok"><h3>✅ Pembayaran Berhasil!</h3><p style="margin-top:6px;font-size:13px">Memuat struk pesanan...</p></div>
+      </div>
+      <p class="co-total" id="totalText"></p>
+      <button class="pay-btn" onclick="payNow()" id="payBtn">Bayar Sekarang</button>
+    </div>
+  </div>
+</div>
+
+<!-- CART PAGE -->
+<div id="cartPage" class="cart-pg hidden">
+  <div class="cart-hdr">
+    <button class="back-btn" onclick="closeCart()">←</button>
+    <h2>Keranjang Saya</h2>
+    <span style="width:56px"></span>
+  </div>
+  <div class="cart-wrap" id="cartItems"></div>
+  <div class="cart-foot">
+    <div class="cart-total-row">
+      <span class="cart-total-lbl">Total Pembayaran</span>
+      <span class="cart-total-val" id="cartTotal">Rp 0</span>
+    </div>
+    <button class="cart-co-btn" onclick="goCheckout()">Lanjut ke Checkout →</button>
+  </div>
+</div>
+
+<!-- RECEIPT -->
+<div id="receiptOverlay" class="receipt-overlay hidden">
+  <div class="receipt-wrap">
+    <div class="rc-top">
+      <h2>Luné Veloura</h2>
+      <p>Luxury Heels Boutique</p>
+      <p>📍 Jakarta, Indonesia</p>
+      <div class="rc-badge">✅ Pesanan Berhasil Dikonfirmasi</div>
+    </div>
+    <div class="rc-body">
+      <div class="rc-sec-lbl">Info Pesanan</div>
+      <div class="rc-row"><span class="lbl">No. Pesanan</span><span class="val rc-order-id" id="rcOrderId"></span></div>
+      <div class="rc-row"><span class="lbl">Tanggal</span><span class="val" id="rcDate"></span></div>
+      <div class="rc-row"><span class="lbl">Status</span><span class="val"><span class="rc-status-chip">Dikonfirmasi</span></span></div>
+      <div class="rc-sec-lbl">Penerima</div>
+      <div class="rc-row"><span class="lbl">Nama</span><span class="val" id="rcName"></span></div>
+      <div class="rc-row"><span class="lbl">No HP</span><span class="val" id="rcPhone"></span></div>
+      <div class="rc-row"><span class="lbl">Alamat</span><span class="val" id="rcAddress" style="max-width:55%;word-break:break-word"></span></div>
+      <div class="rc-sec-lbl">Produk yang Dibeli</div>
+      <div id="rcItems"></div>
+      <div class="rc-div"></div>
+      <div class="rc-row"><span class="lbl">Subtotal</span><span class="val" id="rcSubtotal"></span></div>
+      <div id="rcDiscRow" class="rc-discount hidden"><span>🎟 Diskon Voucher (20%)</span><span id="rcDiscount"></span></div>
+      <div class="rc-row"><span class="lbl">Ongkos Kirim</span><span class="val" style="color:#2e7d32;font-weight:bold">GRATIS</span></div>
+      <div class="rc-div"></div>
+      <div class="rc-total-row"><span class="t-lbl">TOTAL BAYAR</span><span class="t-val" id="rcTotal"></span></div>
+      <div class="rc-row"><span class="lbl">Metode Bayar</span><span class="val"><span class="rc-pay-chip" id="rcPayment"></span></span></div>
+    </div>
+    <div class="rc-barcode">
+      <img id="rcBarcode" src="" alt="QR" style="width:88px;height:88px;border-radius:6px">
+      <p id="rcOrderCode"></p>
+    </div>
+    <div class="rc-foot-note">Terima kasih telah berbelanja di Luné Veloura! 🛍<br>Estimasi pengiriman: <strong>2–4 hari kerja</strong><br>Pertanyaan? <strong>0812-3456-7890</strong></div>
+    <div class="rc-actions">
+      <button class="btn-print" onclick="window.print()">🖨 Cetak Struk</button>
+      <button class="btn-close-rc" onclick="closeReceipt()">Tutup</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* DATA */
+const BASE = [
+  {name:"Zara Maroon",price:4500000,rating:4.9,desc:"Heels elegan warna maroon dengan bahan premium Italia. Cocok untuk acara formal, dinner, maupun kasual chic.",img:"https://i.pinimg.com/736x/c3/01/60/c30160f1a85651dc20d4356e34510fa2.jpg",tag:"zara"},
+  {name:"Saint Laurent Black",price:13000000,rating:5.0,desc:"Ikon fashion dunia — desain hitam sleek nan elegan khas Saint Laurent, sempurna untuk party dan acara malam glamor.",img:"https://i.pinimg.com/736x/7f/94/5b/7f945b7cd6daed5dc9263f6472487596.jpg",tag:"saint"},
+  {name:"Zara Leopard",price:6000000,rating:4.8,desc:"Motif leopard bold dan mewah yang memancarkan keberanian. Statement piece yang bikin tampilan langsung standout.",img:"https://i.pinimg.com/736x/5f/34/60/5f346040a87de1147cb8a2d4d60086bd.jpg",tag:"leopard"},
+  {name:"Christian Dior Black",price:25000000,rating:4.7,desc:"Warisan desain rumah mode Paris. Kualitas jahitan dan bahan terbaik — investasi gaya yang tak lekang waktu.",img:"https://i.pinimg.com/1200x/0d/91/ec/0d91ec9e33501f295e77c85851968cce.jpg",tag:"dior"}
+];
+
+let products=[];
+for(let i=0;i<5;i++) for(let j=0;j<4;j++){
+  let p={...BASE[j%4]};
+  p.name+=' #'+(i*4+j+1);
+  p.price+=(i*4+j)*15000;
+  p.rating=Math.min(5.0,parseFloat((p.rating+(i*0.01)).toFixed(1)));
+  products.push(p);
+}
+
+let cart=[],selected=null,lastOrder=null;
+
+/* NAV */
+function showPage(pg){
+  document.getElementById('pg-home').classList.toggle('hidden',pg!=='home');
+  document.getElementById('pg-prod').classList.toggle('hidden',pg!=='products');
+  document.getElementById('nb-home').classList.toggle('active',pg==='home');
+  document.getElementById('nb-prod').classList.toggle('active',pg==='products');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* BEST SELLERS */
+const bsRow=document.getElementById('bsRow');
+BASE.forEach((p,i)=>{
+  bsRow.innerHTML+=`<div class="bs-card" onclick="openDetail(${i})">
+    <span class="bs-badge">⭐ Best Seller</span>
+    <img src="${p.img}" loading="lazy" alt="${p.name}">
+    <div class="bs-card-body">
+      <p class="bs-card-name">${p.name}</p>
+      <p class="bs-card-price">Rp ${p.price.toLocaleString('id-ID')}</p>
+      <p class="bs-card-stars">⭐ ${p.rating} · Terjual 100+</p>
+    </div>
+  </div>`;
+});
+
+/* ALL PRODUCTS */
+function renderProds(tag='all'){
+  const grid=document.getElementById('prodGrid');
+  grid.innerHTML='';
+  const list=tag==='all'?products:products.filter(p=>p.tag===tag);
+  list.forEach(p=>{
+    const idx=products.indexOf(p);
+    grid.innerHTML+=`<div class="prod-card" onclick="openDetail(${idx})">
+      <img src="${p.img}" loading="lazy" alt="${p.name}">
+      <div class="prod-card-body">
+        <p class="prod-card-name">${p.name}</p>
+        <p class="prod-card-desc">${p.desc}</p>
+        <p class="prod-card-price">Rp ${p.price.toLocaleString('id-ID')}</p>
+        <p class="prod-card-stars">⭐ ${p.rating}</p>
+      </div>
+    </div>`;
+  });
+}
+renderProds();
+
+function filterProds(tag,el){
+  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  renderProds(tag);
+}
+
+/* DETAIL */
+function openDetail(i){
+  selected=products[i];
+  document.getElementById('dImg').src=selected.img;
+  document.getElementById('dName').innerText=selected.name;
+  document.getElementById('dPrice').innerText='Rp '+Number(selected.price).toLocaleString('id-ID');
+  document.getElementById('dRating').innerText='⭐ '+selected.rating+'  ·  Terjual 100+';
+  document.getElementById('dDesc').innerText=selected.desc;
+  const btn=document.getElementById('addCartBtn');
+  btn.style.background='#ee4d2d';btn.innerText='+ Keranjang';
+  const panel=document.getElementById('detailPanel');
+  panel.scrollTop=0;
+  panel.classList.add('active');
+}
+function closeDetail(){document.getElementById('detailPanel').classList.remove('active')}
+
+/* BUBBLE */
+function fireBubble(fromX,fromY){
+  const cartEl=document.querySelector('.nav-cart');
+  const r=cartEl.getBoundingClientRect();
+  const toX=r.left+r.width/2,toY=r.top+r.height/2;
+  const b=document.createElement('div');
+  b.className='cart-bubble';
+  b.style.cssText=`left:${fromX}px;top:${fromY}px`;
+  b.style.setProperty('--tx',(toX-fromX)+'px');
+  b.style.setProperty('--ty',(toY-fromY)+'px');
+  b.style.animation='flyToCart 0.65s cubic-bezier(0.25,0.46,0.45,0.94) forwards';
+  document.body.appendChild(b);
+  b.addEventListener('animationend',()=>{
+    b.remove();
+    const badge=document.getElementById('cartCount');
+    badge.style.transform='scale(1.8)';badge.style.transition='transform 0.12s';
+    setTimeout(()=>{badge.style.transform='scale(1)'},180);
+  });
+}
+
+function addToCart(){
+  if(!selected)return;
+  let idx=cart.findIndex(c=>c.name===selected.name);
+  if(idx>-1)cart[idx].qty++;
+  else cart.push({...selected,qty:1});
+  updateCartCount();
+  const btn=document.getElementById('addCartBtn');
+  const rect=btn.getBoundingClientRect();
+  fireBubble(rect.left+rect.width/2,rect.top+rect.height/2);
+  btn.style.background='#27ae60';btn.innerText='✓ Ditambahkan';
+  setTimeout(()=>{btn.style.background='#ee4d2d';btn.innerText='+ Keranjang'},1300);
+}
+
+function buyNow(){
+  if(!selected)return;
+  let idx=cart.findIndex(c=>c.name===selected.name);
+  if(idx>-1)cart[idx].qty++;
+  else cart.push({...selected,qty:1});
+  updateCartCount();
+  closeDetail();
+  goCheckout();
+}
+
+/* CART */
+function openCart(){
+  document.getElementById('cartPage').classList.remove('hidden');
+  renderCart();
+}
+function closeCart(){document.getElementById('cartPage').classList.add('hidden')}
+function updateCartCount(){document.getElementById('cartCount').innerText=cart.reduce((a,b)=>a+b.qty,0)}
+
+function renderCart(){
+  const wrap=document.getElementById('cartItems');
+  const totalEl=document.getElementById('cartTotal');
+  wrap.innerHTML='';
+  let total=0;
+  if(cart.length===0){
+    wrap.innerHTML=`<div class="cart-empty"><p>Keranjang masih kosong</p><p style="font-size:13px">Yuk, pilih heels impianmu!</p></div>`;
+  } else {
+    cart.forEach((c,i)=>{
+      total+=c.price*c.qty;
+      wrap.innerHTML+=`<div class="cart-item">
+        <img src="${c.img}" alt="${c.name}">
+        <div class="ci-info">
+          <p class="ci-name">${c.name}</p>
+          <p class="ci-price">Rp ${c.price.toLocaleString('id-ID')}</p>
+          <div class="ci-qty">
+            <button class="qty-btn" onclick="changeQty(${i},-1)">−</button>
+            <span style="color:white;font-weight:700;min-width:20px;text-align:center">${c.qty}</span>
+            <button class="qty-btn" onclick="changeQty(${i},1)">+</button>
+          </div>
+        </div>
+        <button class="del-btn" onclick="delItem(${i})">🗑</button>
+      </div>`;
+    });
+  }
+  totalEl.innerText='Rp '+total.toLocaleString('id-ID');
+}
+
+function changeQty(i,d){cart[i].qty+=d;if(cart[i].qty<1)cart.splice(i,1);updateCartCount();renderCart()}
+function delItem(i){cart.splice(i,1);updateCartCount();renderCart()}
+
+/* CHECKOUT */
+function goCheckout(){
+  if(cart.length===0)return alert('Keranjang masih kosong!');
+  closeCart();
+  const panel=document.getElementById('checkoutPanel');
+  panel.scrollTop=0;
+  panel.classList.add('active');
+  calcTotal();
+}
+
+function closeCheckout(){
+  document.getElementById('checkoutPanel').classList.remove('active');
+  document.getElementById('qrisSection').classList.add('hidden');
+  document.getElementById('qrisSuccess').style.display='none';
+  document.getElementById('payBtn').classList.remove('hidden');
+  document.getElementById('payment').value='';
+  document.getElementById('totalText').innerText='';
+}
+
+function calcTotal(){
+  let total=cart.reduce((a,b)=>a+b.price*b.qty,0);
+  let v=document.getElementById('voucher').value;
+  let disc=v==='heelsnyaqaqa'?total*0.2:0;
+  let final=total-disc;
+  let txt='Total: Rp '+final.toLocaleString('id-ID');
+  if(disc>0)txt+=' (Hemat Rp '+disc.toLocaleString('id-ID')+')';
+  document.getElementById('totalText').innerText=txt;
+}
+document.getElementById('voucher').addEventListener('input',calcTotal);
+
+function handlePaymentChange(){
+  const val=document.getElementById('payment').value;
+  const sec=document.getElementById('qrisSection');
+  const btn=document.getElementById('payBtn');
+  if(val==='qris'){
+    sec.classList.remove('hidden');btn.classList.add('hidden');
+    let n=5;
+    const timer=document.getElementById('qrisTimer');
+    const succ=document.getElementById('qrisSuccess');
+    timer.style.display='block';succ.style.display='none';
+    timer.innerText='Menunggu pembayaran... '+n+'s';
+    const iv=setInterval(()=>{
+      n--;
+      if(n>0)timer.innerText='Menunggu pembayaran... '+n+'s';
+      else{
+        clearInterval(iv);timer.style.display='none';succ.style.display='block';
+        lastOrder=buildOrder();lastOrder.payment='QRIS';
+        setTimeout(()=>{closeCheckout();cart=[];updateCartCount();showReceipt()},1500);
+      }
+    },1000);
+  } else {sec.classList.add('hidden');btn.classList.remove('hidden')}
+}
+
+function buildOrder(){
+  let total=cart.reduce((a,b)=>a+b.price*b.qty,0);
+  let v=document.getElementById('voucher').value;
+  let disc=v==='heelsnyaqaqa'?total*0.2:0;
+  return{
+    orderId:'LV-'+Math.random().toString(36).substr(2,8).toUpperCase(),
+    items:[...cart],total,discount:disc,finalTotal:total-disc,
+    name:document.getElementById('nameInput').value||'Pelanggan',
+    phone:document.getElementById('phoneInput').value||'-',
+    address:document.getElementById('addressInput').value||'-',
+    payment:document.getElementById('payment').value||'Transfer Bank'
+  };
+}
+
+function payNow(){
+  if(cart.length===0)return alert('Keranjang kosong!');
+  if(!document.getElementById('payment').value)return alert('Pilih metode pembayaran!');
+  lastOrder=buildOrder();
+  closeCheckout();cart=[];updateCartCount();showReceipt();
+}
+
+/* RECEIPT */
+function showReceipt(){
+  const d=lastOrder;if(!d)return;
+  const now=new Date();
+  document.getElementById('rcOrderId').innerText=d.orderId;
+  document.getElementById('rcDate').innerText=now.toLocaleDateString('id-ID',{weekday:'long',year:'numeric',month:'long',day:'numeric'})+', '+now.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'});
+  document.getElementById('rcName').innerText=d.name;
+  document.getElementById('rcPhone').innerText=d.phone;
+  document.getElementById('rcAddress').innerText=d.address;
+  document.getElementById('rcSubtotal').innerText='Rp '+d.total.toLocaleString('id-ID');
+  document.getElementById('rcTotal').innerText='Rp '+d.finalTotal.toLocaleString('id-ID');
+  document.getElementById('rcPayment').innerText=d.payment;
+  const discRow=document.getElementById('rcDiscRow');
+  if(d.discount>0){discRow.classList.remove('hidden');document.getElementById('rcDiscount').innerText='-Rp '+d.discount.toLocaleString('id-ID')}
+  else discRow.classList.add('hidden');
+  document.getElementById('rcItems').innerHTML=d.items.map(item=>
+    `<div class="rc-item-row"><span class="rc-item-name">${item.name}</span><span class="rc-item-qty">x${item.qty}</span><span class="rc-item-price">Rp ${(item.price*item.qty).toLocaleString('id-ID')}</span></div>`
+  ).join('');
+  const qr=encodeURIComponent('LuneVeloura|'+d.orderId+'|'+d.finalTotal);
+  document.getElementById('rcBarcode').src='https://api.qrserver.com/v1/create-qr-code/?size=90x90&data='+qr;
+  document.getElementById('rcOrderCode').innerText=d.orderId;
+  document.getElementById('receiptOverlay').classList.remove('hidden');
+}
+function closeReceipt(){document.getElementById('receiptOverlay').classList.add('hidden');lastOrder=null}
+
+/* SPLASH */
+window.addEventListener('load',()=>{
+  setTimeout(()=>{
+    document.getElementById('splash').classList.add('fade-out');
+    setTimeout(()=>document.getElementById('splash').style.display='none',800);
+  },2200);
+});
+</script>
+</body>
+</html>
